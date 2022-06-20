@@ -1,4 +1,4 @@
-from random import random
+import random
 from math import e
 
 ARCHIVO1 = "QAP_sko56_04_n.txt"
@@ -68,7 +68,7 @@ def criterio_aceptacion(mejor_puntaje, nuevo_puntaje, T):
         return False
 
     p = e**(-ds/T)
-    random_prob = random()
+    random_prob = random.random()
 
     if random_prob < p:
         return True
@@ -76,16 +76,37 @@ def criterio_aceptacion(mejor_puntaje, nuevo_puntaje, T):
     return False
 
 
-def swap():
-    pass
-
+def swap(lista_cant_personas, tam_locales, n):
+    a = None
+    b = None
+    while True:
+        a = random.randint(0, n-1)
+        b = random.randint(0, n-1)
+        if a != b:
+            break
+    
+    # Swap en los tamanios de los locales
+    copy_tam = tam_locales[a]
+    tam_locales[a] = tam_locales[b]
+    tam_locales[b] = copy_tam
+    
+    # Swap en la lista de personas esperadas
+    for i in range(n):
+        copy_pers = lista_cant_personas[i][a]
+        lista_cant_personas[i][a] = lista_cant_personas[i][b]
+        lista_cant_personas[i][b] = copy_pers
+            
 
 def main():
+    # Parametros
+    alfa = 0.7
+    T = 15000
+    max_iter = 8000
+
     input_usuario = None
-    datos = leer_archivo(ARCHIVO1)
+    datos = None
 
     # Elegir instancia
-    """
     while input_usuario != 1 and input_usuario != 2:
         input_usuario = input('Elegir instancia. [1/2]: ')
         if input_usuario == '1':
@@ -94,13 +115,33 @@ def main():
         elif input_usuario == '2':
             input_usuario = 2
             datos = leer_archivo(ARCHIVO2)
-    """
 
     # Parametros
     n = dividir_cant_locales(datos) # Cantidad de locales
     tam_locales = dividir_tam_locales(datos) # Tamanio de los locales
     lista_cant_personas = dividir_personas_esperadas(datos) # Cantidad de gente esperada por local
+    
+    # Solucion inicial
+    mejor_vecindario = lista_cant_personas
+    mejor_tam_locales = tam_locales
+    mejor_puntaje = calcular_esfuerzo(n, mejor_tam_locales, mejor_vecindario)
 
+    for i in range(max_iter):
+        nuevo_vecindario = mejor_vecindario
+        nuevo_tam_locales = mejor_tam_locales
+        swap(nuevo_vecindario, nuevo_tam_locales, n)
+        nuevo_puntaje = calcular_esfuerzo(n, nuevo_tam_locales, nuevo_vecindario)
+        
+        if criterio_aceptacion(mejor_puntaje, nuevo_puntaje, T):
+            mejor_puntaje = nuevo_puntaje
+            mejor_vecindario = nuevo_vecindario
+            mejor_tam_locales = nuevo_tam_locales
+        
+        T *= alfa
+    
+    print("Mejor puntaje: {}".format(mejor_puntaje))
+    print("Mejor vecindario:\n{}\n{}".format(mejor_tam_locales, mejor_vecindario))
+    
 
 if __name__ == '__main__':
     main()
