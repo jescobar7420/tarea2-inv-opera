@@ -12,6 +12,7 @@ from math import e
 FILE1 = "QAP_sko56_04_n.txt"
 FILE2 = "QAP_sko100_04_n.txt"
 T_END = 0.2
+MAX_ITER = 8000
 
 
 def read_file(file):
@@ -141,8 +142,9 @@ def main():
     best_size_stores = size_stores
     best_score = calculate_efford(n_stores, best_size_stores, best_neighborhood)
 
-    # Hacer iteraciones hasta que se cumpla el criterio de termino
-    while ending_requirement(temperature):
+    # Hacer iteraciones hasta que se cumpla el criterio de termino o llegue al máximo de iteraciones
+    i = 0
+    while ending_requirement(temperature) and i < MAX_ITER:
         # Crear nueva solución con swap de la solución anterior
         new_neighborhood = best_neighborhood
         new_size_stores = best_size_stores
@@ -157,6 +159,7 @@ def main():
         
         # Disminuir temperatura por cada iteración
         temperature *= alfa
+        i += 1
         print("Temperatura actual: {}".format(temperature))
     print("Mejor puntaje: {}".format(best_score))
     print("Mejor vecindario:\n{}\n{}".format(best_size_stores, best_neighborhood))
