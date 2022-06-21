@@ -3,6 +3,7 @@ from math import e
 
 ARCHIVO1 = "QAP_sko56_04_n.txt"
 ARCHIVO2 = "QAP_sko100_04_n.txt"
+T_TERMINO = 0.2
 
 
 def leer_archivo(archivo):
@@ -95,13 +96,18 @@ def swap(lista_cant_personas, tam_locales, n):
         copy_pers = lista_cant_personas[i][a]
         lista_cant_personas[i][a] = lista_cant_personas[i][b]
         lista_cant_personas[i][b] = copy_pers
+
+
+def criterio_termino(T, T_TERMINO):
+    if T < T_TERMINO:
+        return False
+    return True
             
 
 def main():
     # Parametros
-    alfa = 0.7
+    alfa = 0.9
     T = 15000
-    max_iter = 8000
 
     input_usuario = None
     datos = None
@@ -126,7 +132,7 @@ def main():
     mejor_tam_locales = tam_locales
     mejor_puntaje = calcular_esfuerzo(n, mejor_tam_locales, mejor_vecindario)
 
-    for i in range(max_iter):
+    while criterio_termino(T, T_TERMINO):
         nuevo_vecindario = mejor_vecindario
         nuevo_tam_locales = mejor_tam_locales
         swap(nuevo_vecindario, nuevo_tam_locales, n)
@@ -138,6 +144,7 @@ def main():
             mejor_tam_locales = nuevo_tam_locales
         
         T *= alfa
+        print("Temperatura actual: {}".format(T))
     
     print("Mejor puntaje: {}".format(mejor_puntaje))
     print("Mejor vecindario:\n{}\n{}".format(mejor_tam_locales, mejor_vecindario))
